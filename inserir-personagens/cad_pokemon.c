@@ -2,6 +2,7 @@
 #include <stdlib.h>
 
 typedef struct s_pokemon {
+    int cod;
     char nome[30];
     int ataque;
     int defesa;
@@ -67,6 +68,8 @@ void cadPokemon(){
     verAbertura(arquivo);
 
     /*entrada de dados*/
+    printf("Digite o Codigo: \n");
+    scanf("%d", &mochila.cod);
     printf("Digite o nome: ");
     scanf(" %29[^\n]s", mochila.nome);
     printf("Digite o Ataque: ");
@@ -97,6 +100,7 @@ void imprimirArquivo(){
     for(i=0;i<quantidade;i++){
         fseek(arquivo, i*sizeof(pokemon), SEEK_SET);
         fread(&mochila, sizeof(pokemon), 1, arquivo);
+        printf("Cod: %d\n", mochila.cod);
         printf("Pokemon: %s\n", mochila.nome);
         printf("Ataque: %d\n", mochila.ataque);
         printf("Defesa: %d\n\n\n", mochila.defesa);

@@ -15,10 +15,12 @@ JOGO ACABA QUANDO O JOGADOR CAPTURAR TODOS OS POKEMONS
 
 #include<stdio.h>
 #include<stdlib.h>
+#include <string.h>
 #include<time.h>
+#include <math.h>
 
 typedef struct s_pokemon {
-    //int cod;
+    int cod;
     char nome[30];
     int ataque;
     int defesa;
@@ -27,13 +29,13 @@ typedef struct s_pokemon {
 void inicializarCampo(char [][20]);
 void imprimirCampo(char [][20]);
 void distribuirPokemons(char [][20]);
-void iniciarPokemons(pokemon *);
+pokemon *iniciarPokemons();
+void imprimirMochila(pokemon *, int);
+void menorDistancia(char [][20], int []);
 
 int main(){
     /*
         O que falta fazer ?
-            0) Adicionar um codigo na struct pokemon para vincular ao vetor opponents
-            0) Terminar função iniciarPokemons.
             1) FUNÇÃO INICIAR POKEMON TALVEZ POSSA PRECISAR RETORNAR A QUANTIDADE DE POKEMONS
             2) Implementar função imprimir mochila
                 2.1) Realizar o Vinculo do numero do mapa com a Struct
@@ -44,22 +46,55 @@ int main(){
                 5.2) Se ganhar, colocar o pokemon no inventario novamente
     */
     char campo[20][20];    
-    int vet[10];
+    int vet[10], quant_mochila, pos_op[2];
     pokemon *opponents = NULL;
+    pokemon *mochila = NULL;
     
     /*Alocando Opponents*/
-    opponents = (pokemon *) malloc(sizeof(pokemon));
+    opponents = (pokemon *) malloc(12*sizeof(pokemon));
     if(opponents == NULL){
         printf("ERRO DE ALOCACOA !! \n");
         exit(1);
     }
-
+    mochila = (pokemon*) malloc(12*sizeof(pokemon));
+    if(mochila == NULL){
+        printf("ERRO DE ALOCACOA !! \n");
+        exit(1);
+    }
     inicializarCampo(campo);
-    imprimirCampo(campo);
     distribuirPokemons(campo);
+    system("cls");
+    printf("====================================== Pokemom ======================================\n");
+    printf("By: Gabriel Oliveira\n\n");
+
     imprimirCampo(campo);
-    iniciarPokemons(opponents);
-    
+    opponents = iniciarPokemons();
+
+    /*Inicializando com 2 pokemons na mochila*/
+    mochila[0].cod = opponents[10].cod;
+    strcpy(mochila[0].nome, opponents[10].nome);
+    mochila[0].ataque = opponents[10].ataque;
+    mochila[0].defesa = opponents[10].defesa;
+
+    mochila[1].cod = opponents[11].cod;
+    strcpy(mochila[1].nome, opponents[11].nome);
+    mochila[1].ataque = opponents[11].ataque;
+    mochila[1].defesa = opponents[11].defesa;
+    quant_mochila = 2;
+
+/*
+    printf("Opponents Distributed\n");
+    for(int i=0;i<12;i++){
+        printf("Cod.: %d\n", (opponents+i)->cod);
+        printf("Nome.: %s\n", (opponents+i)->nome);
+        printf("Ataque.: %d\n", (opponents+i)->ataque);
+        printf("Defesa.: %d\n", (opponents+i)->defesa);
+    }
+*/
+    imprimirMochila(mochila, quant_mochila);
+    menorDistancia(campo, pos_op);
+    printf("POKEMON: %c\n", campo[pos_op[0]][pos_op[1]]);
+
     return 0;
 }
 void inicializarCampo(char campo[][20]){
@@ -108,9 +143,10 @@ void distribuirPokemons(char campo[][20]){
 
 }
 /*Essa função (iniciarPokemons) depende do arquivo cad_pokemon*/
-void iniciarPokemons(pokemon *deck){
+pokemon *iniciarPokemons(){
     long tam;
     int flag, i;
+    pokemon *deck;
     FILE *arquivo;
     arquivo = fopen("inserir-personagens/cad_pokemon.bin", "rb");
     if(arquivo == NULL){
@@ -123,15 +159,14 @@ void iniciarPokemons(pokemon *deck){
     fseek(arquivo, 0, SEEK_END); /*posiciona o arquivo no final*/
     tam = ftell(arquivo)/sizeof(pokemon); /*divide seu tamnho pelo tamanho da estrutura*/
   
-    /*Realocação,*/
-    deck = (pokemon *) realloc(deck, tam*sizeof(pokemon));
+    /*Alocação*/
+    deck = (pokemon *) malloc(tam*sizeof(pokemon));
   
     /*voltar o arquivo para o inicio*/
     rewind(arquivo);
   
     /*alocacao*/
     flag = fread(deck, sizeof(pokemon), tam, arquivo);
-    
     
     /*Log de erro*/
     if(flag != tam){
@@ -141,14 +176,53 @@ void iniciarPokemons(pokemon *deck){
         system("pause");
         exit(1);
     }
-/*
-    printf("Os Pokemons Distribuidos no Mapa foram\n\n");
-    for(i=0;i<tam;i++){
-        //printf("Cod.: %d\n", (deck+i)->cod);
-        printf("Nome.: %s\n", (deck+i)->nome);
-        printf("Ataque.: %d\n", (deck+i)->ataque);
-        printf("Defesa.: %d\n", (deck+i)->defesa);
-    }
-*/  
+
+  
     fclose(arquivo);
+
+    return deck;
+}
+void imprimirMochila(pokemon *bag, int quant){
+    int i;
+    printf("\nYour Bag: \n");
+    for(i=0;i<quant;i++){
+        //printf("Cod.: %d\n", (bag+i)->cod);
+        printf("\nNome.: %s\n", (bag+i)->nome);
+        printf("Ataque.: %d\n", (bag+i)->ataque);
+        printf("Defesa.: %d\n", (bag+i)->defesa);
+    }
+}
+void menorDistancia(char campo[][20], int pos_op[]){
+
+    int i, j, pos_x, pos_y, menor_x, menor_y;
+    double aux, menor_distancia=99999999;
+    /*Descobrindo posição atual no mapa*/
+    for(i=0;i<20;i++){
+        for(j=0;j<20;j++){
+            if(campo[i][j] == '*'){
+                pos_x = i+1;
+                pos_y = j+1;
+            }
+        }
+    }
+
+    /*Calculando menor Distancia*/
+    for(i=0;i<20;i++){
+        for(j=0;j<20;j++){
+            if(campo[i][j] != ' ' && campo[i][j] != '*'){
+                aux = sqrt(pow(((i+1)-pos_x), 2) + pow(((j+1)-pos_y), 2));
+                printf("Dist ate ponto (%d,  %d) Valor [%c] = %f\n", i+1, j+1, campo[i][j], aux);
+                if(menor_distancia > aux){
+                    menor_distancia = aux;
+                    menor_x = i;
+                    menor_y = j;
+                }
+            }
+        }
+    }
+
+    /*Imprimindo Elemento mais proximo*/
+    printf("Elemento Mais proximo do Jogador: %c", campo[menor_x][menor_y]);
+    pos_op[0] = menor_x;
+    pos_op[1] = menor_y;
 }
