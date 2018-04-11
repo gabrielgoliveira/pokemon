@@ -1,0 +1,9 @@
+O que falta fazer ?
+   1) FUNÇÃO INICIAR POKEMON TALVEZ POSSA PRECISAR RETORNAR A QUANTIDADE DE POKEMONS
+   2) Implementar função imprimir mochila
+      2.1) Realizar o Vinculo do numero do mapa com a Struct
+   3) Implementar função inicializar Mochila
+   4) Implementar função calcular menor distancia
+   5) Implementar função batalhar
+      5.1) Escolher pokemon da Mochila para Duelar
+      5.2) Se ganhar, colocar o pokemon no inventario novamente
